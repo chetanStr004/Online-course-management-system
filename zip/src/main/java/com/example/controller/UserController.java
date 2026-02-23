@@ -11,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = { "http://localhost:4200", "https://ocm-system.vercel.app" })
 
 public class UserController {
 
