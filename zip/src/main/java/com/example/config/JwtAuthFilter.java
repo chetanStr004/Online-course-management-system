@@ -23,21 +23,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private JwtUtil jwtUtil;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return path.startsWith("/api/auth/");
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain)
             throws ServletException, IOException {
 
-        String path = request.getServletPath();
-
-        // ✅ Skip filtering for OPTIONS (Preflight) requests
+        // ✅ Immediate pass for OPTIONS (Preflight)
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        // ✅ Skip filtering for auth endpoints
-        if (path.startsWith("/api/auth")) {
+            response.setStatus(HttpServletResponse.SC_OK);
             filterChain.doFilter(request, response);
             return;
         }

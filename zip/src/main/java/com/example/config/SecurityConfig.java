@@ -31,6 +31,9 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults()) // ✅ ADD THIS
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // ✅ Explicitly
+                                                                                                         // permit all
+                                                                                                         // preflight
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
