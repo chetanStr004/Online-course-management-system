@@ -1,0 +1,131 @@
+.dashboard-landing {
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    animation: fadeIn 0.6s ease-out;
+}
+
+.welcome-header {
+    margin-bottom: 48px;
+    text-align: center;
+
+    h1 {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--header-text);
+        margin-bottom: 12px;
+        letter-spacing: -1px;
+    }
+
+    p {
+        font-size: 18px;
+        color: var(--text-color);
+        opacity: 0.7;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 28px;
+}
+
+.dashboard-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+
+    &:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border-color: var(--primary-color);
+
+        .explore-btn {
+            color: var(--primary-color);
+            transform: translateX(4px);
+        }
+    }
+}
+
+.card-icon-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+
+    .card-icon {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+.card-content {
+    flex-grow: 1;
+
+    h3 {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--header-text);
+        margin-bottom: 12px;
+    }
+
+    p {
+        font-size: 15px;
+        color: var(--text-color);
+        line-height: 1.6;
+        opacity: 0.8;
+    }
+}
+
+.card-footer {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+
+    .explore-btn {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-color);
+        transition: all 0.2s ease;
+        display: inline-block;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-landing {
+        padding: 24px 16px;
+    }
+
+    .welcome-header h1 {
+        font-size: 26px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}

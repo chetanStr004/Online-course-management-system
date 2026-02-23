@@ -1,0 +1,209 @@
+<div class="dashboard-wrapper">
+  <app-loader></app-loader>
+  <div class="toast" [class.show]="toastVisible">{{ toastMessage }}</div>
+
+  <!-- ================= FORM ================= -->
+  <div class="course-container course-form-container">
+    <h2>Student Course Mapping</h2>
+
+    <form [formGroup]="mappingForm" (ngSubmit)="submit()">
+      <div class="form-row two-cols">
+        <!-- STUDENT (multi-select dropdown) -->
+        <div class="form-field">
+          <label>Student <span class="required">*</span></label>
+          <div class="multi-select">
+            <div class="select-input" [ngClass]="{ disabled: editMode }" (click)="
+                editMode ? $event.stopPropagation() : toggleStudentsDropdown()
+              ">
+              <div class="placeholders">
+                <ng-container *ngIf="selectedStudents.length === 0">Select students</ng-container>
+                <ng-container *ngFor="let s of selectedStudents">
+                  <span class="pill" title="{{ s.name }}">{{ s.name }}
+                    <span class="x" *ngIf="!editMode" (click)="
+                        removeSelectedStudent(s); $event.stopPropagation()
+                      ">✕</span></span>
+                </ng-container>
+              </div>
+              <span class="caret">▾</span>
+            </div>
+
+            <div class="dropdown" *ngIf="studentsDropdownOpen">
+              <input #studentSearchInput type="text" placeholder="Search students..." [(ngModel)]="studentSearch"
+                [ngModelOptions]="{ standalone: true }" (input)="onStudentSearch(studentSearchInput.value)"
+                (click)="$event.stopPropagation()" />
+              <ul class="options">
+                <li *ngFor="let s of studentFilterList">
+                  <label (click)="$event.stopPropagation()">
+                    <input type="checkbox" [checked]="isStudentSelected(s)" (click)="
+                        toggleStudentSelection(s); $event.stopPropagation()
+                      " />
+                    <span class="opt-label">{{ s.name }}
+                      <small class="muted">{{ s.email }}</small></span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="error" *ngIf="submitted && selectedStudents.length === 0">
+            Student is required
+          </div>
+        </div>
+
+        <!-- COURSE (multi-select dropdown) -->
+        <div class="form-field">
+          <label>Course <span class="required">*</span></label>
+          <div class="multi-select">
+            <div class="select-input" (click)="toggleCoursesDropdown()">
+              <div class="placeholders">
+                <ng-container *ngIf="selectedCourses.length === 0">Select courses</ng-container>
+                <ng-container *ngFor="let c of selectedCourses">
+                  <span class="pill" title="{{ c.name }}">{{ c.name }}
+                    <span class="x" (click)="
+                        removeSelectedCourse(c); $event.stopPropagation()
+                      ">✕</span></span>
+                </ng-container>
+              </div>
+              <span class="caret">▾</span>
+            </div>
+
+            <div class="dropdown" *ngIf="coursesDropdownOpen">
+              <input #courseSearchInput type="text" placeholder="Search courses..." [(ngModel)]="courseSearch"
+                [ngModelOptions]="{ standalone: true }" (input)="onCourseSearch(courseSearchInput.value)"
+                (click)="$event.stopPropagation()" />
+              <ul class="options">
+                <li *ngFor="let c of courseFilterList">
+                  <label (click)="$event.stopPropagation()">
+                    <input type="checkbox" [checked]="isCourseSelected(c)" (click)="
+                        toggleCourseSelection(c); $event.stopPropagation()
+                      " />
+                    <span class="opt-label">{{ c.name }}</span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="error" *ngIf="submitted && selectedCourses.length === 0">
+            Course is required
+          </div>
+        </div>
+      </div>
+
+      <!-- FORM ACTIONS -->
+      <div class="form-actions">
+        <button type="submit" class="submit-btn">
+          {{ editMode ? "Update Mapping" : "Assign Course" }}
+        </button>
+        <button type="button" class="reset-btn" (click)="resetForm()">
+          Reset
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ================= LIST ================= -->
+  <div class="course-container course-list-container">
+    <h2>Student Course List</h2>
+
+    <!-- TOOLBAR -->
+    <div class="table-toolbar">
+      <div class="toolbar-left">
+        <label>
+          <select [(ngModel)]="pageSize" (ngModelChange)="changePageSize($event)">
+            <option *ngFor="let s of pageSizeOptions" [value]="s">
+              {{ s }}
+            </option>
+          </select>
+          <span class="entries-label">Entries per page</span>
+        </label>
+      </div>
+
+      <div class="toolbar-right">
+        <input class="search" placeholder="Search all..." (input)="filter($event)" />
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <table class="course-table">
+      <thead>
+        <tr>
+          <th>S.No</th>
+
+          <!-- STUDENT NAME -->
+          <th (click)="activateColumnSearch('student_name')">
+            <ng-container *ngIf="activeSearchColumn !== 'student_name'">
+              Student
+            </ng-container>
+            <div class="header-search" *ngIf="activeSearchColumn === 'student_name'">
+              <input type="text" placeholder="Search student" (click)="$event.stopPropagation()"
+                (input)="onColumnSearch('student_name', $event)" />
+              <span class="clear" (click)="
+                  clearColumnSearch('student_name'); $event.stopPropagation()
+                ">✕</span>
+            </div>
+          </th>
+
+          <!-- COURSE NAME -->
+          <th (click)="activateColumnSearch('course_names')">
+            <ng-container *ngIf="activeSearchColumn !== 'course_names'">
+              Course
+            </ng-container>
+            <div class="header-search" *ngIf="activeSearchColumn === 'course_names'">
+              <input type="text" placeholder="Search course" (click)="$event.stopPropagation()"
+                (input)="onColumnSearch('course_names', $event)" />
+              <span class="clear" (click)="
+                  clearColumnSearch('course_names'); $event.stopPropagation()
+                ">✕</span>
+            </div>
+          </th>
+
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let m of pagedMappings; let i = index">
+          <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+          <td>{{ m.student_name }}</td>
+          <td>{{ m.course_names }}</td>
+          <td>
+            <button class="edit" (click)="edit(m)">Edit</button>
+            <button class="delete" (click)="deleteMapping(m)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- PAGINATION CONTROLS -->
+    <div class="pagination-row">
+      <div class="page-info">
+        <div class="showing">
+          Showing
+          {{ totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1 }} -
+          {{ Math.min(currentPage * pageSize, totalItems) }} of
+          {{ totalItems }} entries
+        </div>
+      </div>
+
+      <div class="page-controls compact">
+        <button class="chev" (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
+          ‹
+        </button>
+
+        <div class="page-input-wrap">
+          <input name="currentPage" type="number" class="page-input" [(ngModel)]="currentPage"
+            (ngModelChange)="changePage($event)" min="1" [max]="totalPages" />
+          <span class="page-sep">/</span>
+          <span class="page-total">{{ totalPages }}</span>
+        </div>
+
+        <button class="chev" (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">
+          ›
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-confirm-modal [visible]="showConfirmModal" [title]="modalTitle" [message]="modalMessage"
+  [confirmText]="confirmText" [type]="confirmMode" (confirm)="confirmModalAction()" (cancel)="cancelModal()">
+</app-confirm-modal>

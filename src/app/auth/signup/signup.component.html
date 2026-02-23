@@ -1,0 +1,107 @@
+<div class="signup-container">
+  <div class="signup-wrapper">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <form #signupForm="ngForm" (ngSubmit)="signup(signupForm)" class="signup-form">
+      <div class="form-header">
+        <h1>Join Us Today</h1>
+        <p>Create your account to get started</p>
+      </div>
+
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M6 20c0-3.5 3.6-6 6-6s6 2.5 6 6"></path>
+          </svg>
+          <input
+            id="name"
+            type="text"
+            name="name"
+            [(ngModel)]="signupData.name"
+            required
+            placeholder="John Doe"
+            class="form-input"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="signup-email">Email Address</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+          </svg>
+          <input
+            id="signup-email"
+            type="email"
+            name="email"
+            [(ngModel)]="signupData.email"
+            required
+            email
+            placeholder="you@example.com"
+            class="form-input"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="signup-password">Password</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M12 1v6m0 0v10a5 5 0 01-5-5V7a5 5 0 015-5zm0 0h5a2 2 0 012 2v10a5 5 0 01-5 5v-5a5 5 0 01-5-5V7a2 2 0 012-2h5z"></path>
+            <rect x="6" y="12" width="12" height="5" rx="1"></rect>
+          </svg>
+          <input
+            id="signup-password"
+            type="password"
+            name="password"
+            [(ngModel)]="signupData.password"
+            required
+            minlength="6"
+            placeholder="Min 6 characters"
+            class="form-input"
+          />
+        </div>
+        <div class="password-hint">At least 6 characters for security</div>
+      </div>
+
+      <div class="form-group">
+        <label for="role">Select Role</label>
+        <div class="select-wrapper">
+          <svg class="select-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+          </svg>
+          <select
+            id="role"
+            name="role"
+            [(ngModel)]="signupData.role"
+            required
+            class="form-select"
+          >
+            <option value="" disabled>Choose your role</option>
+            <option value="STUDENT">Student</option>
+            <option value="INSTRUCTOR">Instructor</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="signupForm.submitted && signupForm.invalid">
+        <span>Create Account</span>
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+        </svg>
+      </button>
+
+      <div class="divider">
+        <span>Already a member?</span>
+      </div>
+
+      <p class="login-link">
+        Have an account?
+        <a routerLink="/login">Sign in here</a>
+      </p>
+    </form>
+  </div>
+</div>

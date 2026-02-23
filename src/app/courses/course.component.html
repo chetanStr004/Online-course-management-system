@@ -1,0 +1,295 @@
+<div class="dashboard-wrapper">
+  <app-loader></app-loader>
+  <div class="toast" [class.show]="toastVisible">{{ toastMessage }}</div>
+  <div class="course-container course-form-container">
+    <h2>Course Management</h2>
+
+    <form [formGroup]="courseForm" (ngSubmit)="submit()">
+      <!-- ROW 1 -->
+      <div class="form-row four-cols">
+        <!-- Course Name -->
+        <div class="form-field">
+          <label>Course Name <span class="required">*</span></label>
+          <input formControlName="name" placeholder="Enter course name" [readonly]="editMode" />
+          <div class="error" *ngIf="
+              (courseForm.get('name')?.touched || submitted) &&
+              courseForm.get('name')?.invalid
+            ">
+            <div *ngIf="courseForm.get('name')?.hasError('required')">Course name is required</div>
+            <div *ngIf="courseForm.get('name')?.hasError('minlength')">Course name must be at least 3 characters</div>
+            <div *ngIf="courseForm.get('name')?.hasError('whitespace')">Course name cannot be blank or only spaces</div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-field">
+          <label>Description <span class="required">*</span></label>
+          <input formControlName="description" placeholder="Enter description" />
+          <div class="error" *ngIf="
+              (courseForm.get('description')?.touched || submitted) &&
+              courseForm.get('description')?.invalid
+            ">
+            <div *ngIf="courseForm.get('description')?.hasError('required')">Description is required</div>
+            <div *ngIf="courseForm.get('description')?.hasError('minlength')">Description must be at least 10 characters
+            </div>
+            <div *ngIf="courseForm.get('description')?.hasError('whitespace')">Description cannot be blank or only
+              spaces</div>
+            <div *ngIf="courseForm.get('description')?.hasError('maxWords')">
+              Description cannot exceed 50 words
+              <span *ngIf="courseForm.get('description')?.getError('maxWords')?.actualWords">({{
+                courseForm.get('description')?.getError('maxWords')?.actualWords }} words)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Student Limit -->
+        <div class="form-field">
+          <label>Student Limit <span class="required">*</span></label>
+          <input type="number" formControlName="studentLimit" placeholder="Enter student limit (0-100)" min="0"
+            max="100" />
+          <div class="error"
+            *ngIf="(courseForm.get('studentLimit')?.touched || submitted) && courseForm.get('studentLimit')?.errors">
+            <div *ngIf="courseForm.get('studentLimit')?.hasError('required')">Student limit is required</div>
+            <div *ngIf="courseForm.get('studentLimit')?.hasError('min')">Student limit cannot be less than 0</div>
+            <div *ngIf="courseForm.get('studentLimit')?.hasError('max')">Student limit cannot exceed 100</div>
+          </div>
+        </div>
+
+        <!-- Instructor name -->
+        <div class="form-field">
+          <label>Instructor Name <span class="required">*</span></label>
+          <select formControlName="instructorId">
+            <option value="">Select Instructor</option>
+
+            <option *ngFor="let i of instructors" [value]="i.id">
+              {{ i.name }} ({{ i.phone }})
+            </option>
+          </select>
+          <div class="error" *ngIf="
+              (courseForm.get('instructorId')?.touched || submitted) &&
+              courseForm.get('instructorId')?.invalid
+            ">
+            Instructor Name is required
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 2 -->
+      <div class="form-row two-cols">
+        <div class="form-field">
+          <label>Course Type</label>
+          <select formControlName="type">
+            <option value="MANDATORY">Mandatory</option>
+            <option value="OPTIONAL">Optional</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label>Status</label>
+          <select formControlName="status">
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+          </select>
+        </div>
+
+        <!-- buttons removed from here and placed after the form -->
+      </div>
+      <!-- Buttons placed outside the last .form-row, aligned to bottom-right -->
+      <div class="form-actions">
+        <button type="submit" class="submit-btn">
+          {{ editMode ? "Update" : "Create" }}
+        </button>
+        <button type="button" class="reset-btn" (click)="resetForm()">
+          Reset
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <div class="course-container course-list-container">
+    <h2>Course List</h2>
+
+    <!-- TABLE TOOLBAR: entries selector (left) + global search (right) -->
+    <div class="table-toolbar">
+      <div class="toolbar-left">
+        <label>
+          <select name="pageSize" [(ngModel)]="pageSize" (ngModelChange)="changePageSize($event)">
+            <option *ngFor="let s of pageSizeOptions" [value]="s">{{ s }}</option>
+          </select>
+          <span class="entries-label">Entries per page</span>
+        </label>
+      </div>
+
+      <div class="toolbar-right">
+        <input class="search" placeholder="Search all..." (input)="filter($event)" />
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <table class="course-table">
+      <thead>
+        <tr>
+          <th>S.No </th>
+          <!-- NAME -->
+          <th (click)="activateColumnSearch('name')">
+            <ng-container *ngIf="activeSearchColumn !== 'name'">
+              Name
+            </ng-container>
+
+            <div class="header-search" *ngIf="activeSearchColumn === 'name'">
+              <input type="text" placeholder="Search name" (click)="$event.stopPropagation()"
+                (input)="onColumnSearch('name', $event)" />
+              <span class="clear" (click)="clearColumnSearch('name'); $event.stopPropagation()">
+                ✕
+              </span>
+            </div>
+          </th>
+
+          <!-- DESCRIPTION -->
+          <th (click)="activateColumnSearch('description')">
+            <ng-container *ngIf="activeSearchColumn !== 'description'">
+              Description
+            </ng-container>
+
+            <div class="header-search" *ngIf="activeSearchColumn === 'description'">
+              <input type="text" placeholder="Search description" (click)="$event.stopPropagation()"
+                (input)="onColumnSearch('description', $event)" />
+              <span class="clear" (click)="
+                  clearColumnSearch('description'); $event.stopPropagation()
+                ">
+                ✕
+              </span>
+            </div>
+          </th>
+
+          <!-- INSTRUCTOR ID -->
+          <th (click)="activateColumnSearch('instructor_id')">
+            <ng-container *ngIf="activeSearchColumn !== 'instructor_id'">
+              Instructor ID
+            </ng-container>
+
+            <div class="header-search" *ngIf="activeSearchColumn === 'instructor_id'">
+              <input type="text" placeholder="Search instructor" (click)="$event.stopPropagation()"
+                (input)="onColumnSearch('instructor_id', $event)" />
+              <span class="clear" (click)="
+                  clearColumnSearch('instructor_id'); $event.stopPropagation()
+                ">
+                ✕
+              </span>
+            </div>
+          </th>
+
+          <!-- TYPE -->
+          <th (click)="activateColumnSearch('type')">
+            <ng-container *ngIf="activeSearchColumn !== 'type'">
+              Type
+            </ng-container>
+
+            <div class="header-search" *ngIf="activeSearchColumn === 'type'">
+              <input type="text" placeholder="Search type" (click)="$event.stopPropagation()"
+                (input)="onColumnSearch('type', $event)" />
+              <span class="clear" (click)="clearColumnSearch('type'); $event.stopPropagation()">
+                ✕
+              </span>
+            </div>
+          </th>
+
+          <!-- LIMIT -->
+          <th (click)="activateColumnSearch('student_limit')">
+            <ng-container *ngIf="activeSearchColumn !== 'student_limit'">
+              Limit
+            </ng-container>
+
+            <div class="header-search" *ngIf="activeSearchColumn === 'student_limit'">
+              <input type="text" placeholder="Search limit" (click)="$event.stopPropagation()"
+                (input)="onColumnSearch('student_limit', $event)" />
+              <span class="clear" (click)="
+                  clearColumnSearch('student_limit'); $event.stopPropagation()
+                ">
+                ✕
+              </span>
+            </div>
+          </th>
+
+          <!-- STATUS -->
+          <th (click)="activateColumnSearch('status')">
+            <ng-container *ngIf="activeSearchColumn !== 'status'">
+              Status
+            </ng-container>
+
+            <div class="header-search" *ngIf="activeSearchColumn === 'status'">
+              <input type="text" placeholder="Search status" (click)="$event.stopPropagation()"
+                (input)="onColumnSearch('status', $event)" />
+              <span class="clear" (click)="clearColumnSearch('status'); $event.stopPropagation()">
+                ✕
+              </span>
+            </div>
+          </th>
+
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let c of pagedCourses; let i = index">
+          <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+          <td>{{ c.name }}</td>
+          <td>{{ c.description }}</td>
+          <td>{{ c.instructor_id }}</td>
+          <td>
+            <span class="badge" [ngClass]="{
+                'badge-mandatory': c.type === 'MANDATORY',
+                'badge-optional': c.type === 'OPTIONAL'
+              }">
+              {{ c.type }}
+            </span>
+          </td>
+          <td>{{ c.student_limit }}</td>
+          <td>
+            <span class="badge" [ngClass]="{
+                'badge-active': c.status === 'ACTIVE',
+                'badge-inactive': c.status === 'INACTIVE'
+              }">
+              {{ c.status }}
+            </span>
+          </td>
+          <td>
+            <button type="button" class="edit" (click)="edit(c)">Edit</button>
+            <button type="button" class="delete" (click)="deleteCourse(c)">
+              Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- PAGINATION CONTROLS -->
+    <div class="pagination-row">
+      <div class="page-info">
+        <div class="showing">
+          Showing {{ totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1 }} -
+          {{ Math.min(currentPage * pageSize, totalItems) }} of {{ totalItems }} entries
+        </div>
+      </div>
+
+      <div class="page-controls compact">
+        <button class="chev" (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">‹</button>
+
+        <div class="page-input-wrap">
+          <input name="currentPage" type="number" class="page-input" [(ngModel)]="currentPage"
+            (ngModelChange)="changePage($event)" min="1" [max]="totalPages" />
+          <span class="page-sep">/</span>
+          <span class="page-total">{{ totalPages }}</span>
+        </div>
+
+        <button class="chev" (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">›</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-confirm-modal [visible]="showConfirmModal" [title]="modalTitle" [message]="modalMessage"
+  [confirmText]="confirmText" [type]="confirmMode"
+  (confirm)="confirmMode === 'delete' ? confirmDelete() : confirmSave()" (cancel)="cancelModal()">
+</app-confirm-modal>

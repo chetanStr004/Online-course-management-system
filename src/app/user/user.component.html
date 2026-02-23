@@ -1,0 +1,300 @@
+<div class="dashboard-wrapper">
+  <app-loader></app-loader>
+
+  <!-- Toast -->
+  <div class="toast" [class.show]="toastVisible">
+    {{ toastMessage }}
+  </div>
+
+  <!-- ================= USER FORM ================= -->
+  <div class="user-container user-form-container">
+    <h2>User Management</h2>
+
+    <form [formGroup]="userForm" (ngSubmit)="submit()">
+      <!-- ROW 1 -->
+      <div class="user-form-row four-cols">
+        <div class="user-form-field">
+          <label>Name <span class="user-required">*</span></label>
+          <input type="text" placeholder="Enter name" formControlName="name" />
+          <span class="user-error" *ngIf="isInvalid('name')">
+            Name is required (min 3 characters)
+          </span>
+        </div>
+
+        <div class="user-form-field">
+          <label>Email <span class="user-required">*</span></label>
+          <input type="email" placeholder="Enter email" formControlName="email" />
+          <span class="user-error" *ngIf="isInvalid('email')">
+            <ng-container *ngIf="userForm.get('email')?.errors?.['required']">
+              Email is required
+            </ng-container>
+
+            <ng-container *ngIf="userForm.get('email')?.errors?.['email']">
+              Enter a valid email address
+            </ng-container>
+          </span>
+        </div>
+
+        <div class="user-form-field">
+          <label>Password <span class="user-required">*</span></label>
+          <input type="password" placeholder="Enter password" formControlName="password" />
+          <span class="user-error" *ngIf="isInvalid('password')">
+            <ng-container *ngIf="userForm.get('password')?.errors?.['required']">
+              Password is required
+            </ng-container>
+
+            <ng-container *ngIf="userForm.get('password')?.errors?.['minlength']">
+              Password must be at least 6 characters
+            </ng-container>
+
+            <ng-container *ngIf="userForm.get('password')?.errors?.['whitespace']">
+              Password cannot contain spaces
+            </ng-container>
+          </span>
+        </div>
+
+        <div class="user-form-field">
+          <label>Phone <span class="user-required">*</span></label>
+          <input type="text" placeholder="Enter phone number" formControlName="phone" maxlength="10" inputmode="numeric"
+            (input)="onPhoneInput($event)" />
+          <span class="user-error" *ngIf="isInvalid('phone')">
+            Enter a valid 10-digit mobile number
+          </span>
+        </div>
+      </div>
+
+      <!-- ROW 2 -->
+      <div class="user-form-row two-cols">
+        <div class="user-form-field">
+          <label>Role <span class="user-required">*</span></label>
+          <select formControlName="role">
+            <option value="STUDENT">Student</option>
+            <option value="INSTRUCTOR">Instructor</option>
+          </select>
+        </div>
+
+        <div class="user-form-field">
+          <label>Status</label>
+          <select formControlName="status">
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="user-form-actions">
+        <button type="submit" class="user-submit-btn">
+          {{ editMode ? "Update User" : "Create User" }}
+        </button>
+        <button type="button" class="user-reset-btn" (click)="resetForm()">
+          Reset
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ================= USER LIST ================= -->
+  <div class="user-container user-list-container">
+    <h2>User List</h2>
+
+    <!-- TABLE TOOLBAR -->
+    <!-- TABLE TOOLBAR -->
+    <div class="user-table-toolbar">
+      <div class="toolbar-left">
+        <label>
+          <select [(ngModel)]="pageSize" (ngModelChange)="changePageSize($event)">
+            <option *ngFor="let s of pageSizeOptions" [value]="s">
+              {{ s }}
+            </option>
+          </select>
+          <span class="entries-label">Entries per page</span>
+        </label>
+      </div>
+
+      <div class="toolbar-right">
+        <input class="user-search" type="text" placeholder="Search all..." (input)="filter($event)" />
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <table class="user-table">
+      <thead>
+        <tr>
+          <th>S.No</th>
+
+          <!-- NAME -->
+          <th (click)="activateColumnSearch('name')">
+            <ng-container *ngIf="activeSearchColumn !== 'name'">
+              Name
+            </ng-container>
+
+            <div class="header-search" *ngIf="activeSearchColumn === 'name'">
+              <input placeholder="Search name" (click)="$event.stopPropagation()"
+                (input)="onColumnSearch('name', $event)" />
+              <span class="clear" (click)="clearColumnSearch('name'); $event.stopPropagation()">
+                ✕
+              </span>
+            </div>
+          </th>
+
+          <!-- EMAIL -->
+          <th (click)="activateColumnSearch('email')">
+            <ng-container *ngIf="activeSearchColumn !== 'email'">
+              Email
+            </ng-container>
+
+            <div class="header-search" *ngIf="activeSearchColumn === 'email'">
+              <input placeholder="Search email" (click)="$event.stopPropagation()"
+                (input)="onColumnSearch('email', $event)" />
+              <span class="clear" (click)="clearColumnSearch('email'); $event.stopPropagation()">
+                ✕
+              </span>
+            </div>
+          </th>
+
+          <!-- PASSWORD -->
+          <!-- <th (click)="activateColumnSearch('password')">
+            <ng-container *ngIf="activeSearchColumn !== 'password'">
+              Password
+            </ng-container>
+
+            <div
+              class="header-search"
+              *ngIf="activeSearchColumn === 'password'"
+            >
+              <input
+                placeholder="Search password"
+                (click)="$event.stopPropagation()"
+                (input)="onColumnSearch('password', $event)"
+              />
+              <span
+                class="clear"
+                (click)="
+                  clearColumnSearch('password'); $event.stopPropagation()
+                "
+              >
+                ✕
+              </span>
+            </div>
+          </th> -->
+
+          <!-- PHONE -->
+          <th (click)="activateColumnSearch('phone')">
+            <ng-container *ngIf="activeSearchColumn !== 'phone'">
+              Phone
+            </ng-container>
+
+            <div class="header-search" *ngIf="activeSearchColumn === 'phone'">
+              <input placeholder="Search phone" (click)="$event.stopPropagation()"
+                (input)="onColumnSearch('phone', $event)" />
+              <span class="clear" (click)="clearColumnSearch('phone'); $event.stopPropagation()">
+                ✕
+              </span>
+            </div>
+          </th>
+
+          <!-- ROLE -->
+          <th (click)="activateColumnSearch('role')">
+            <ng-container *ngIf="activeSearchColumn !== 'role'">
+              Role
+            </ng-container>
+
+            <div class="header-search" *ngIf="activeSearchColumn === 'role'">
+              <input placeholder="Search role" (click)="$event.stopPropagation()"
+                (input)="onColumnSearch('role', $event)" />
+              <span class="clear" (click)="clearColumnSearch('role'); $event.stopPropagation()">
+                ✕
+              </span>
+            </div>
+          </th>
+
+          <!-- STATUS -->
+          <th (click)="activateColumnSearch('status')">
+            <ng-container *ngIf="activeSearchColumn !== 'status'">
+              Status
+            </ng-container>
+
+            <div class="header-search" *ngIf="activeSearchColumn === 'status'">
+              <input placeholder="Search status" (click)="$event.stopPropagation()"
+                (input)="onColumnSearch('status', $event)" />
+              <span class="clear" (click)="clearColumnSearch('status'); $event.stopPropagation()">
+                ✕
+              </span>
+            </div>
+          </th>
+
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let u of pagedUsers; let i = index">
+          <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+          <td>{{ u.name }}</td>
+          <td>{{ u.email }}</td>
+          <!-- <td>{{ u.password }}</td> -->
+          <td>{{ u.phone }}</td>
+          <td>
+            <span class="user-badge" [ngClass]="{
+                'user-badge-student': u.role == 'STUDENT',
+                'user-badge-instructor': u.role == 'INSTRUCTOR'
+              }">
+              {{ u.role }}
+            </span>
+          </td>
+          <td>
+            <span class="user-badge" [ngClass]="{
+                'user-badge-active': u.status == 'ACTIVE',
+                'user-badge-inactive': u.status == 'INACTIVE'
+              }">
+              {{ u.status }}
+            </span>
+          </td>
+          <td>
+            <button type="button" class="user-edit-btn" (click)="edit(u)">
+              Edit
+            </button>
+
+            <button type="button" class="user-delete-btn" (click)="deleteUser(u)">
+              Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- PAGINATION -->
+    <div class="pagination-row">
+      <div class="page-info">
+        Showing
+        {{ totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1 }}
+        -
+        {{ Math.min(currentPage * pageSize, totalItems) }}
+        of {{ totalItems }} entries
+      </div>
+
+      <div class="page-controls compact">
+        <button class="chev" (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
+          ‹
+        </button>
+
+        <div class="page-input-wrap">
+          <input type="number" class="page-input" [(ngModel)]="currentPage" (ngModelChange)="changePage($event)" min="1"
+            [max]="totalPages" />
+          <span class="page-sep">/</span>
+          <span class="page-total">{{ totalPages }}</span>
+        </div>
+
+        <button class="chev" (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">
+          ›
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<app-confirm-modal [visible]="showConfirmModal" [title]="modalTitle" [message]="modalMessage"
+  [confirmText]="confirmText" [type]="confirmMode"
+  (confirm)="confirmMode === 'delete' ? confirmDelete() : confirmSave()" (cancel)="cancelModal()"></app-confirm-modal>

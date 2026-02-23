@@ -1,0 +1,159 @@
+@import '../../../shared-styles';
+
+:host {
+  position: sticky;
+  top: 0;
+  z-index: 1200;
+}
+
+/* Navbar */
+.apple-navbar {
+  height: 64px;
+  width: 100%;
+  padding: 0 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: var(--nav-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Left side */
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+/* Brand / Logo */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 16px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.logo-container:hover {
+  transform: scale(1.02);
+}
+
+.logo-icon {
+  width: 28px;
+  height: 28px;
+  stroke: var(--primary-color);
+  stroke-width: 2.5;
+}
+
+.brand-text {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  color: var(--header-text);
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Links */
+.nav-left a {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--link-color);
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.nav-left a:hover {
+  background: var(--link-hover-bg);
+}
+
+.nav-left a.active {
+  font-weight: 600;
+  color: var(--primary-color);
+  background: var(--link-hover-bg);
+}
+
+/* Right side */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Theme Toggle */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+  background: var(--link-hover-bg);
+  transform: scale(1.05);
+}
+
+.theme-toggle svg {
+  stroke: var(--text-color);
+}
+
+/* User */
+.user {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-color);
+  opacity: 0.9;
+}
+
+/* Logout */
+.logout {
+  @extend .btn-v3;
+  @extend .btn-v3-compact;
+  @extend .btn-v3-outline;
+  color: var(--danger-color);
+  border-color: var(--border-color);
+}
+
+.logout:hover {
+  background: rgba(239, 68, 68, 0.05);
+  border-color: var(--danger-color);
+  color: var(--danger-color);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .user {
+    display: none;
+  }
+
+  .nav-left {
+    gap: 12px;
+  }
+
+  .apple-navbar {
+    padding: 0 16px;
+  }
+
+  .brand {
+    font-size: 18px;
+  }
+}
