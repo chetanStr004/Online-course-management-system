@@ -11,7 +11,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:4200") // ✅ ADD THIS
+@CrossOrigin(origins = { "http://localhost:4200", "https://ocm-system.vercel.app" })
 
 public class UserController {
 
@@ -19,7 +19,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/saveUsers")
-    public ResponseEntity<Map<String,Object>> saveUser(
+    public ResponseEntity<Map<String, Object>> saveUser(
             @RequestBody UserDTO dto) {
 
         return ResponseEntity.ok(userService.saveOrUpdateUser(dto));

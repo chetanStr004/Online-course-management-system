@@ -11,7 +11,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/student-course")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = { "http://localhost:4200", "https://ocm-system.vercel.app" })
 
 public class StudentCourseController {
 
@@ -20,16 +20,15 @@ public class StudentCourseController {
 
     // CREATE / UPDATE / DELETE
     @PostMapping("/saveSC")
-    public ResponseEntity<Map<String,Object>> saveOrUpdateCourse( @RequestBody StudentCourseDTO dto) {
+    public ResponseEntity<Map<String, Object>> saveOrUpdateCourse(@RequestBody StudentCourseDTO dto) {
 
         return ResponseEntity.ok(
-                service.saveOrUpdateCourse(dto)
-        );
+                service.saveOrUpdateCourse(dto));
     }
 
     // GET ALL OR BY STUDENT ID
     @GetMapping("/getSC")
-    public ResponseEntity<List<Map<String,Object>>> getStudentCourseMapping(
+    public ResponseEntity<List<Map<String, Object>>> getStudentCourseMapping(
             @RequestParam(required = false) Integer studentId) {
 
         return ResponseEntity.ok(service.getStudentCourseMapping(studentId));

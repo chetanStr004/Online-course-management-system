@@ -11,12 +11,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = { "http://localhost:4200", "https://ocm-system.vercel.app" })
 public class AuthController {
 
     @Autowired
     private AuthService authService;
-
 
     // ================= SIGNUP =================
     @PostMapping("/signup")
@@ -26,7 +25,7 @@ public class AuthController {
 
     // ================= LOGIN =================
     @PostMapping("/login")
-    public ResponseEntity<Map<String,Object>> login(@RequestBody UserAuthDTO dto) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody UserAuthDTO dto) {
         return ResponseEntity.ok(authService.login(dto));
     }
 }

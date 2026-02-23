@@ -11,16 +11,14 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/courses")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = { "http://localhost:4200", "https://ocm-system.vercel.app" })
 public class CourseController {
 
     @Autowired
-    private CourseService courseService ;
-
-
+    private CourseService courseService;
 
     @PostMapping("/saveCourses")
-    public ResponseEntity<Map<String,Object>> saveOrUpdateCourse(
+    public ResponseEntity<Map<String, Object>> saveOrUpdateCourse(
             @RequestBody CourseDTO courseDTO) {
 
         Map<String, Object> course = courseService.saveOrUpdateCourse(courseDTO);
@@ -28,7 +26,7 @@ public class CourseController {
     }
 
     @GetMapping("/getCourses")
-    public ResponseEntity<List<Map<String,Object>>> getCourses(
+    public ResponseEntity<List<Map<String, Object>>> getCourses(
             @RequestParam(required = false) Integer id) {
 
         return ResponseEntity.ok(courseService.getCourses(id));
