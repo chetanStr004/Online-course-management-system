@@ -29,17 +29,30 @@ public class Course {
     private Integer instructorId;
 
     @Column(name = "type", nullable = false)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Enumerated(EnumType.STRING)
     private CourseType type;
 
-    @Column(name = "created_date")
+    @Column(name = "created_date", updatable = false)
     private LocalDateTime createdDate;
 
     @Column(name = "modified_date")
     private LocalDateTime modifiedDate;
 
     @Column(name = "status")
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Enumerated(EnumType.STRING)
     private Status status;
 
+    @PrePersist
+    protected void onCreate() {
+        if (this.status == null) {
+            this.status = Status.ACTIVE;
+        }
+        this.createdDate = LocalDateTime.now();
+        this.modifiedDate = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.modifiedDate = LocalDateTime.now();
+    }
 }
