@@ -24,6 +24,7 @@ export // Token Interceptor Function
       catchError((error: HttpErrorResponse) => {
 
         if (error.status === 401 || error.status === 403) {
+          console.error('🔒 Authentication error detected:', error.status, error.url);
           // 🔐 Clear auth and redirect ONLY in browser
           if (isPlatformBrowser(platformId)) {
             localStorage.clear();

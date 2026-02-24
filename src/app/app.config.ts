@@ -1,6 +1,7 @@
 import { ApplicationConfig, importProvidersFrom, inject } from '@angular/core';
 import { provideHttpClient, withInterceptors, HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { provideRouter, Router } from '@angular/router';
+import { provideClientHydration } from '@angular/platform-browser'; // ✅ ADD THIS
 import { routes } from './app.routes';
 
 import { FormsModule } from '@angular/forms';
@@ -12,7 +13,8 @@ import { tokenInterceptor } from './core/interceptors/token.interceptor';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    provideHttpClient(withInterceptors([tokenInterceptor,loaderInterceptor])),
+    provideClientHydration(), // ✅ ADD THIS
+    provideHttpClient(withFetch(), withInterceptors([tokenInterceptor, loaderInterceptor])),
 
     importProvidersFrom(
       FormsModule,
