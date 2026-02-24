@@ -1,5 +1,5 @@
 import { Injectable, Renderer2, RendererFactory2, Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, DOCUMENT } from '@angular/common';
 
 @Injectable({
     providedIn: 'root',
@@ -11,7 +11,8 @@ export class ThemeService {
 
     constructor(
         rendererFactory: RendererFactory2,
-        @Inject(PLATFORM_ID) private platformId: Object
+        @Inject(PLATFORM_ID) private platformId: Object,
+        @Inject(DOCUMENT) private document: Document
     ) {
         this.isBrowser = isPlatformBrowser(this.platformId);
         this.renderer = rendererFactory.createRenderer(null, null);
@@ -45,13 +46,13 @@ export class ThemeService {
     }
 
     private applyTheme(): void {
-        if (this.isBrowser) {
+        if (this.isBrowser && this.document && this.document.body) {
             if (this.currentTheme === 'dark') {
-                this.renderer.addClass(document.body, 'dark-mode');
-                this.renderer.removeClass(document.body, 'light-mode');
+                this.renderer.addClass(this.document.body, 'dark-mode');
+                this.renderer.removeClass(this.document.body, 'light-mode');
             } else {
-                this.renderer.addClass(document.body, 'light-mode');
-                this.renderer.removeClass(document.body, 'dark-mode');
+                this.renderer.addClass(this.document.body, 'light-mode');
+                this.renderer.removeClass(this.document.body, 'dark-mode');
             }
         }
     }

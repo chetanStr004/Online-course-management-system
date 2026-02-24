@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
   FormBuilder,
   FormGroup,
@@ -30,7 +30,7 @@ export class CourseComponent implements OnInit {
   courseForm!: FormGroup;
   submitted = false;
 
-   instructors: User[] = [];
+  instructors: User[] = [];
   courses: Course[] = [];
   filteredCourses: Course[] = [];
 
@@ -69,16 +69,19 @@ export class CourseComponent implements OnInit {
     private fb: FormBuilder,
     private courseService: CourseService,
     private userService: UserService,
-    private loader: LoaderService
-  ) {}
+    private loader: LoaderService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) { }
 
   /* =========================
      INIT
   ========================= */
   ngOnInit(): void {
     this.initForm();
-    this.loadCourses();
-    this.loadInstructors();
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadCourses();
+      this.loadInstructors();
+    }
   }
 
   /* =========================

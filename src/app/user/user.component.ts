@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
   FormBuilder,
   FormGroup,
@@ -62,11 +62,17 @@ export class UserComponent implements OnInit {
   toastVisible = false;
   toastMessage = '';
 
-  constructor(private fb: FormBuilder, private userService: UserService) {}
+  constructor(
+    private fb: FormBuilder,
+    private userService: UserService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
-    this.loadUsers();
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadUsers();
+    }
   }
 
   initForm() {
@@ -113,19 +119,19 @@ export class UserComponent implements OnInit {
   }
 
   loadUsers(): void {
-  this.userService.getUsersByType('ALL').subscribe((res) => {
+    this.userService.getUsersByType('ALL').subscribe((res) => {
 
-    // 🔥 sort newest users first
-    const sorted = this.sortUsersByCreated(res);
+      // 🔥 sort newest users first
+      const sorted = this.sortUsersByCreated(res);
 
-    this.users = sorted;
-    this.filteredUsers = [...sorted];
+      this.users = sorted;
+      this.filteredUsers = [...sorted];
 
-    this.totalItems = sorted.length;
-    this.currentPage = 1;
-    this.calculatePages();
-  });
-}
+      this.totalItems = sorted.length;
+      this.currentPage = 1;
+      this.calculatePages();
+    });
+  }
 
 
   /* =========================
@@ -270,21 +276,21 @@ export class UserComponent implements OnInit {
 
   edit(u: User) {
     console.log('Editing user:', u);
-  this.editMode = true;
-  this.selectedId = u.id;
+    this.editMode = true;
+    this.selectedId = u.id;
 
-  this.userForm.patchValue({
-    name: u.name,
-    email: u.email,
-    password: u.password,
-    phone: u.phone,
-    role: (u.role || '').toString().toUpperCase(),
-    status: (u.status || '').toString().toUpperCase()
-  });
+    this.userForm.patchValue({
+      name: u.name,
+      email: u.email,
+      password: u.password,
+      phone: u.phone,
+      role: (u.role || '').toString().toUpperCase(),
+      status: (u.status || '').toString().toUpperCase()
+    });
 
-  this.userForm.get('role')?.setValue((u.role || '').toString().toUpperCase());
-  this.userForm.get('status')?.setValue((u.status || '').toString().toUpperCase());
-}
+    this.userForm.get('role')?.setValue((u.role || '').toString().toUpperCase());
+    this.userForm.get('status')?.setValue((u.status || '').toString().toUpperCase());
+  }
 
   deleteUser(u: User): void {
     this.userToDelete = u;

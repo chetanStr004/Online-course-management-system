@@ -5,8 +5,10 @@ import {
   ViewChild,
   ElementRef,
   ChangeDetectorRef,
+  Inject,
+  PLATFORM_ID
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -39,9 +41,9 @@ export class StudentCourseMappingComponent implements OnInit, OnDestroy {
   // dropdown data
   students: any[] = [];
   courses: any[] = [];
-  courseFilterList:any[]=[];
-  studentFilterList:any[]=[];
-  
+  courseFilterList: any[] = [];
+  studentFilterList: any[] = [];
+
   // selected for multi-select
   selectedStudents: any[] = [];
   selectedCourses: any[] = [];
@@ -62,7 +64,7 @@ export class StudentCourseMappingComponent implements OnInit, OnDestroy {
     this.studentFilterList = this.students.filter(
       (s) =>
         (s.name || '').toLowerCase().includes(q) ||
-      (s.email || '').toLowerCase().includes(q)
+        (s.email || '').toLowerCase().includes(q)
     );
     console.log('this.studentFilterList: ', this.studentFilterList);
   }
@@ -70,7 +72,7 @@ export class StudentCourseMappingComponent implements OnInit, OnDestroy {
   onCourseSearch(value: string): void {
     this.courseSearch = (value || '').toString();
     const q = this.courseSearch?.toLowerCase() || '';
-    this.courseFilterList=this.courses.filter((c) => (c.name || '').toLowerCase().includes(q));
+    this.courseFilterList = this.courses.filter((c) => (c.name || '').toLowerCase().includes(q));
     this.cd.detectChanges();
   }
 
@@ -112,14 +114,17 @@ export class StudentCourseMappingComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private service: StudentCourseService,
     private loader: LoaderService,
-    private cd: ChangeDetectorRef
-  ) {}
+    private cd: ChangeDetectorRef,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
-    this.loadStudents();
-    this.loadCourses();
-    this.loadMappings();
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadStudents();
+      this.loadCourses();
+      this.loadMappings();
+    }
   }
 
   /* ================= FORM ================= */
@@ -129,7 +134,7 @@ export class StudentCourseMappingComponent implements OnInit, OnDestroy {
       studentIds: [[], Validators.required],
       courseIds: [[], Validators.required],
     });
-    
+
   }
 
   submit(): void {
@@ -270,7 +275,7 @@ export class StudentCourseMappingComponent implements OnInit, OnDestroy {
       this.courseSearch = '';
 
       this.courseFilterList = [...this.courses];
-      
+
       setTimeout(() => this.courseSearchInput?.nativeElement?.focus(), 0);
     }
   }
