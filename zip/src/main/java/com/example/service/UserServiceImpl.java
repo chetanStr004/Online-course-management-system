@@ -25,15 +25,13 @@ public class UserServiceImpl implements UserService {
     public Map<String, Object> saveOrUpdateUser(UserDTO dto) {
         Map<String, Object> response = new HashMap<>();
 
-
         try {
             User user;
 
-            //update & delete
+            // update & delete
             if (dto.getId() != null) {
                 user = userRepository.findById(dto.getId())
-                        .orElseThrow(() ->
-                                new RuntimeException("User not found with id: " + dto.getId()));
+                        .orElseThrow(() -> new RuntimeException("User not found with id: " + dto.getId()));
                 if (dto.getStatus().equals(Status.valueOf("DELETED"))) {
                     user.setStatus(dto.getStatus());
                     userRepository.save(user);
@@ -44,7 +42,7 @@ public class UserServiceImpl implements UserService {
 
             }
 
-            //create
+            // create
             else {
                 user = new User();
                 user.setCreatedDate(LocalDateTime.now());
@@ -54,16 +52,26 @@ public class UserServiceImpl implements UserService {
             user.setName(dto.getName().trim());
             user.setRole(dto.getRole());
             user.setEmail(dto.getEmail().trim());
-            user.setPassword(passwordEncoder.encode(dto.getPassword().trim()));
-            user.setStatus(dto.getStatus());
+
+            // Protect against empty password updates
+            if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+                user.setPassword(passwordEncoder.encode(dto.getPassword().trim()));
+            }
+
+            // Protect against status loss
+            if (dto.getStatus() != null) {
+                user.setStatus(dto.getStatus());
+            } else if (user.getStatus() == null) {
+                user.setStatus(Status.ACTIVE);
+            }
+
             user.setModifiedDate(LocalDateTime.now());
 
             User saved = userRepository.save(user);
             response.put("success", true);
             response.put("message", "User saved successfully");
             response.put("data", saved);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
 
             response.put("success", false);
             response.put("message", ex.getMessage());

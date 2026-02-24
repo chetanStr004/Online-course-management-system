@@ -23,7 +23,6 @@ public class User {
     @Column(name = "phone")
     private String phone;
 
-
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
@@ -41,7 +40,7 @@ public class User {
     @Column(name = "created_date")
     private LocalDateTime createdDate;
 
-   @Column(name = "modified_date")
+    @Column(name = "modified_date")
     private LocalDateTime modifiedDate;
 
 }
