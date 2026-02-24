@@ -51,7 +51,8 @@ dependencies {
 	// ===== REQUIRED FOR HIBERNATE 7 =====
 	implementation 'org.jboss.logging:jboss-logging:3.6.1.Final'
 
-
+	// ===== MONITORING =====
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 tasks.named('test') {
