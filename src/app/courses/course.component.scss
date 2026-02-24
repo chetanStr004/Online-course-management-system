@@ -442,6 +442,7 @@ button.ocm-form-btn:hover {
 
 .delete {
   @extend .btn-v3, .btn-v3-compact;
+  color: white;
   background: #ef0000;
   margin-right: 8px;
   min-width: 68px;

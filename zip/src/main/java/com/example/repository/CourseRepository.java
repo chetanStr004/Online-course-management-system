@@ -12,6 +12,6 @@ import java.util.Map;
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Integer> {
 
-    @Query(nativeQuery = true, value = "SELECT * FROM Course as c WHERE c.status != 'DELETED' AND (:id = -1 OR c.id = :id); ")
-    List<Map<String,Object>> findCourses(@Param("id") int id);
+    @Query(nativeQuery = true, value = "SELECT * FROM course as c WHERE CAST(c.status AS varchar) != 'DELETED' AND (:id = -1 OR c.id = :id); ")
+    List<Map<String, Object>> findCourses(@Param("id") int id);
 }

@@ -14,14 +14,14 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query(nativeQuery = true, value = """
-        SELECT *
-        FROM users u
-        WHERE u.status != 'DELETED'
-        AND (
-            :role = 'ALL'
-            OR u.role = CAST(:role AS user_role)
-        )
-        """)
+            SELECT *
+            FROM users u
+            WHERE CAST(u.status AS varchar) != 'DELETED'
+            AND (
+                :role = 'ALL'
+                OR CAST(u.role AS varchar) = :role
+            )
+            """)
     List<Map<String, Object>> findUsersByRole(@Param("role") String role);
 
     // ✅ NEW METHOD (FOR LOGIN & SIGNUP)
